@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #include "menu_core.h"
-
+//命名规范：MenuView_<级别>_<作用>_<菜单ID或Common>，换显示屏请自定义自己的MenuView_System_Navigation_Common
 /**
  * @brief 根据菜单模型绘制当前同级菜单页到 LCD 帧缓存。
  * @param items 完整菜单项数组。
