@@ -9,11 +9,11 @@
 #define MENU_VIEW_ITEM_HEIGHT    36U  /**< 每个菜单项占用的垂直像素。 */
 #define MENU_VIEW_SAFE_MARGIN    16U  /**< 圆角窗口四周的安全边距。 */
 
-#define MENU_COLOR_BACKGROUND    0xFF9CU /**< 菜单背景 RGB565 颜色。 */
-#define MENU_COLOR_ITEM          0xF7DAU /**< 普通菜单圆角卡片背景颜色。 */
-#define MENU_COLOR_TEXT          0x4228U /**< 普通菜单文字颜色。 */
-#define MENU_COLOR_SELECTED      0xF4A5U /**< 当前项高亮背景颜色。 */
-#define MENU_COLOR_SELECTED_TEXT 0xFFFFU /**< 当前项高亮文字颜色。 */
+#define MENU_COLOR_BACKGROUND    0xBCCFU /**< 柔和浅茶褐色页面背景。 */
+#define MENU_COLOR_ITEM          0x9C0CU /**< 低亮度灰棕色普通卡片。 */
+#define MENU_COLOR_TEXT          0x3943U /**< 高对比度深咖啡色普通文字。 */
+#define MENU_COLOR_SELECTED      0x7A66U /**< 暖深棕色选中卡片。 */
+#define MENU_COLOR_SELECTED_TEXT 0xFF9AU /**< 奶油白色选中文字。 */
 
 /**
  * @brief 计算文字在圆角安全区内允许显示的字符数。
