@@ -25,9 +25,35 @@ typedef struct {
 } LCD_Stats;
 
 /**
+ * @brief LCD logical drawing direction.
+ */
+typedef enum {
+  LCD_DIRECTION_PORTRAIT = 0,
+  LCD_DIRECTION_LANDSCAPE = 1
+} LCD_Direction;
+
+/**
  * @brief 初始化 ST7789、调色板和帧缓存，并完成首次全屏刷新
  */
-void LCD_UserInit(void);
+void LCD_UserInit(LCD_Direction direction);
+
+/**
+ * @brief Return the logical drawing width for the selected direction.
+ * @return 240 in portrait mode or 280 in landscape mode.
+ */
+uint16_t LCD_GetWidth(void);
+
+/**
+ * @brief Return the logical drawing height for the selected direction.
+ * @return 280 in portrait mode or 240 in landscape mode.
+ */
+uint16_t LCD_GetHeight(void);
+
+/**
+ * @brief Return the direction selected during LCD_UserInit.
+ * @return Current logical drawing direction.
+ */
+LCD_Direction LCD_GetDirection(void);
 
 /**
  * @brief 将帧缓存中的全部脏区统一刷新到 LCD

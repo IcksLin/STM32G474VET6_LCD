@@ -5,6 +5,12 @@ PROJECT_C_SOURCES := \
 Code/Hardwares/lcd_hw.c \
 Code/Hardwares/lcd_user.c \
 Code/Hardwares/lcd_fonts.c \
+Code/Hardwares/lcd_image.c \
+Code/Hardwares/menu_key.c \
+Code/System/menu_core.c \
+Code/System/menu_user.c \
+Code/System/menu_view.c \
+Code/System/interrupt_callback.c \
 Code/System/delay.c
 
 PROJECT_C_INCLUDES := \

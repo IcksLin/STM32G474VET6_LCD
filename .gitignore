@@ -26,3 +26,6 @@ Thumbs.db
 *.bak
 *.swp
 *~
+
+# Host-side one-off image conversion and resize tools
+/Tools/

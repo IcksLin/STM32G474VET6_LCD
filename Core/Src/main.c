@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd_user.h"
+#include "menu_core.h"
 
 /* USER CODE END Includes */
 
@@ -90,13 +91,11 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_TIM1_Init();
+  MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
-  LCD_UserInit();
-  LCD_FB_SetFont(&ASCII_Font24);
-  LCD_FB_SetBackgroundColor(LCD_RGB565(0, 0, 0));
-  LCD_FB_SetPenColor(LCD_RGB565(155, 95, 55));
-  LCD_Printf(54, 118, "Nastume Anan");
-  LCD_Update();
+  LCD_UserInit(LCD_DIRECTION_LANDSCAPE);
+  Menu_Init(50U);
+  HAL_TIM_Base_Start_IT(&htim17);
 
   /* USER CODE END 2 */
 
@@ -107,7 +106,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    /* Display content is updated only when the framebuffer changes. */
+    Menu_Process();
   }
   /* USER CODE END 3 */
 }

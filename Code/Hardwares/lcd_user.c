@@ -21,6 +21,26 @@ static uint8_t pen_index;
 static uint8_t background_index;
 static const pFONT *active_font;
 static LCD_Stats stats;
+static LCD_Direction active_direction = LCD_DIRECTION_PORTRAIT;
+
+/**
+ * @brief Convert logical coordinates to the portrait physical framebuffer.
+ * @param x Logical X coordinate.
+ * @param y Logical Y coordinate.
+ * @param physical_x Resulting physical X coordinate.
+ * @param physical_y Resulting physical Y coordinate.
+ */
+static void logical_to_physical(uint16_t x, uint16_t y,
+                                uint16_t *physical_x, uint16_t *physical_y)
+{
+  if (active_direction == LCD_DIRECTION_LANDSCAPE) {
+    *physical_x = y;
+    *physical_y = (uint16_t)(LCD_FB_HEIGHT - 1U - x);
+  } else {
+    *physical_x = x;
+    *physical_y = y;
+  }
+}
 
 /**
  * @brief 返回两个无符号 16 位整数中的较小值
@@ -106,16 +126,21 @@ static void mark_dirty_rect(int32_t x, int32_t y, int32_t width, int32_t height)
  */
 static void put_index(int16_t x, int16_t y, uint8_t index)
 {
-  if (x < 0 || y < 0 || x >= (int16_t)LCD_FB_WIDTH || y >= (int16_t)LCD_FB_HEIGHT) return;
-  framebuffer[y][x] = index;
-  dirty_tiles[(uint16_t)y / LCD_TILE_SIZE] |= (uint16_t)(1U << ((uint16_t)x / LCD_TILE_SIZE));
+  uint16_t physical_x;
+  uint16_t physical_y;
+  if (x < 0 || y < 0 || x >= (int16_t)LCD_GetWidth() || y >= (int16_t)LCD_GetHeight()) return;
+  logical_to_physical((uint16_t)x, (uint16_t)y, &physical_x, &physical_y);
+  framebuffer[physical_y][physical_x] = index;
+  dirty_tiles[physical_y / LCD_TILE_SIZE] |= (uint16_t)(1U << (physical_x / LCD_TILE_SIZE));
 }
 
 /**
  * @brief 初始化 LCD 用户层、帧缓存和显示控制器
  */
-void LCD_UserInit(void)
+void LCD_UserInit(LCD_Direction direction)
 {
+  active_direction = (direction == LCD_DIRECTION_LANDSCAPE)
+                     ? LCD_DIRECTION_LANDSCAPE : LCD_DIRECTION_PORTRAIT;
   memset(&stats, 0, sizeof(stats));
   palette_count = 0U;
   background_index = palette_index(0x0000U);
@@ -125,6 +150,21 @@ void LCD_UserInit(void)
   (void)LCD_HW_Init();
   LCD_InvalidateAll();
   (void)LCD_Update();
+}
+
+uint16_t LCD_GetWidth(void)
+{
+  return (active_direction == LCD_DIRECTION_LANDSCAPE) ? LCD_FB_HEIGHT : LCD_FB_WIDTH;
+}
+
+uint16_t LCD_GetHeight(void)
+{
+  return (active_direction == LCD_DIRECTION_LANDSCAPE) ? LCD_FB_WIDTH : LCD_FB_HEIGHT;
+}
+
+LCD_Direction LCD_GetDirection(void)
+{
+  return active_direction;
 }
 
 /**
@@ -298,16 +338,22 @@ void LCD_FB_DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t co
 void LCD_FB_FillRect(int16_t x, int16_t y, uint16_t width, uint16_t height, uint16_t color)
 {
   int32_t x1 = x, y1 = y, x2 = (int32_t)x + width, y2 = (int32_t)y + height;
-  int32_t row;
+  int32_t row, column;
   uint8_t index;
   if (x1 < 0) x1 = 0;
   if (y1 < 0) y1 = 0;
-  if (x2 > (int32_t)LCD_FB_WIDTH) x2 = LCD_FB_WIDTH;
-  if (y2 > (int32_t)LCD_FB_HEIGHT) y2 = LCD_FB_HEIGHT;
+  if (x2 > (int32_t)LCD_GetWidth()) x2 = LCD_GetWidth();
+  if (y2 > (int32_t)LCD_GetHeight()) y2 = LCD_GetHeight();
   if (x1 >= x2 || y1 >= y2) return;
   index = palette_index(color);
-  for (row = y1; row < y2; ++row) memset(&framebuffer[row][x1], index, (size_t)(x2 - x1));
-  mark_dirty_rect(x1, y1, x2 - x1, y2 - y1);
+  if (active_direction == LCD_DIRECTION_PORTRAIT) {
+    for (row = y1; row < y2; ++row) memset(&framebuffer[row][x1], index, (size_t)(x2 - x1));
+    mark_dirty_rect(x1, y1, x2 - x1, y2 - y1);
+  } else {
+    for (row = y1; row < y2; ++row)
+      for (column = x1; column < x2; ++column)
+        put_index((int16_t)column, (int16_t)row, index);
+  }
 }
 
 /**
@@ -407,11 +453,11 @@ void LCD_FB_DrawString(int16_t x, int16_t y, const char *text)
   if (text == NULL || active_font == NULL) return;
   while (*text != '\0') {
     if (*text == '\n') { cursor_x = x; y = (int16_t)(y + active_font->Height); ++text; continue; }
-    if (cursor_x + (int16_t)active_font->Width > (int16_t)LCD_FB_WIDTH) {
+    if (cursor_x + (int16_t)active_font->Width > (int16_t)LCD_GetWidth()) {
       cursor_x = x;
       y = (int16_t)(y + active_font->Height);
     }
-    if (y >= (int16_t)LCD_FB_HEIGHT) break;
+    if (y >= (int16_t)LCD_GetHeight()) break;
     LCD_FB_DrawChar(cursor_x, y, *text++);
     cursor_x = (int16_t)(cursor_x + active_font->Width);
   }
