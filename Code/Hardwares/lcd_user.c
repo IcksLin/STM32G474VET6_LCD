@@ -1,3 +1,9 @@
+/**
+ * @file    lcd_user.c
+ * @brief   LCD 用户层实现：索引帧缓存、脏区分块刷新与图形/文字绘制。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #include "lcd_user.h"
 #include "lcd_hw.h"
 
@@ -5,22 +11,33 @@
 #include <stdio.h>
 #include <string.h>
 
-#define LCD_TILE_SIZE       16U
+#define LCD_TILE_SIZE       16U    /**< 脏区分块边长，单位像素。 */
+/** @brief 水平方向分块数量。 */
 #define LCD_TILE_COLS       ((LCD_FB_WIDTH + LCD_TILE_SIZE - 1U) / LCD_TILE_SIZE)
+/** @brief 垂直方向分块行数。 */
 #define LCD_TILE_ROWS       ((LCD_FB_HEIGHT + LCD_TILE_SIZE - 1U) / LCD_TILE_SIZE)
-#define LCD_PALETTE_SIZE    256U
-#define LCD_PRINTF_CAPACITY 256U
+#define LCD_PALETTE_SIZE    256U   /**< 索引调色板容量。 */
+#define LCD_PRINTF_CAPACITY 256U   /**< LCD_Printf 格式化缓冲区字节数。 */
 
-/* 8-bit indexed framebuffer: 67,200 bytes instead of 134,400-byte RGB565. */
+/** 8 位索引帧缓存：67,200 字节，替代 134,400 字节的 RGB565 整屏缓存。 */
 static uint8_t framebuffer[LCD_FB_HEIGHT][LCD_FB_WIDTH];
+/** @brief 索引到 RGB565 的调色板。 */
 static uint16_t palette[LCD_PALETTE_SIZE];
+/** @brief 当前已登记的调色板颜色数量。 */
 static uint16_t palette_count;
+/** @brief 每行分块的脏标志位图，一位代表一个分块。 */
 static uint16_t dirty_tiles[LCD_TILE_ROWS];
+/** @brief 刷新时把索引转成 RGB565 的临时行缓冲。 */
 static uint16_t flush_buffer[LCD_FB_WIDTH * LCD_TILE_SIZE];
+/** @brief 当前画笔颜色的调色板索引。 */
 static uint8_t pen_index;
+/** @brief 当前字符背景色的调色板索引。 */
 static uint8_t background_index;
+/** @brief 当前绘字使用的 ASCII 字体。 */
 static const pFONT *active_font;
+/** @brief 用户层运行统计信息。 */
 static LCD_Stats stats;
+/** @brief 当前逻辑显示方向。 */
 static LCD_Direction active_direction = LCD_DIRECTION_PORTRAIT;
 
 /**

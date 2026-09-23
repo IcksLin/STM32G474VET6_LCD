@@ -1,3 +1,9 @@
+/**
+ * @file    menu_core.c
+ * @brief   菜单内核实现：同级查找、循环导航、动作分发与刷新区间控制。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #include "menu_core.h"
 
 #include <stddef.h>
@@ -169,6 +175,10 @@ void Menu_Process(void)
   MenuAction action = MenuKey_GetAction();
 
   if (action != MENU_ACTION_WAITING) {
+    if (MenuUser_HandleGlobalAction(current_item, action)) {
+      menu_service_refresh();
+      return;
+    }
     if (function_active) {
       if (current_item->handler != NULL) {
         current_item->handler(action);

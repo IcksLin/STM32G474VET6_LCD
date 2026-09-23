@@ -1,3 +1,9 @@
+/**
+ * @file    menu_view.c
+ * @brief   菜单视图实现：导航列表与功能页的茶褐色圆角卡片绘制。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #include "menu_view.h"
 
 #include <string.h>
@@ -225,4 +231,24 @@ void MenuView_User_KeyRemapTest_8(int32_t value)
       (uint16_t)(LCD_GetHeight() - MENU_VIEW_SAFE_MARGIN -
                  ASCII_Font24.Height),
       "BACK: return");
+}
+
+void MenuView_User_StepperControl_Common(const char *title, const char *mode,
+                                         int32_t speed_rpm,
+                                         int32_t angle_degree,
+                                         const char *status)
+{
+  LCD_FB_Clear(MENU_COLOR_BACKGROUND);
+  LCD_FB_SetFont(&ASCII_Font24);
+  LCD_FB_SetPenColor(MENU_COLOR_TEXT);
+  LCD_FB_SetBackgroundColor(MENU_COLOR_BACKGROUND);
+  draw_safe_string(MENU_VIEW_SAFE_MARGIN, MENU_VIEW_SAFE_MARGIN, title);
+  LCD_Printf(MENU_VIEW_SAFE_MARGIN, 50, "Mode:%s", mode);
+  LCD_Printf(MENU_VIEW_SAFE_MARGIN, 82, "RPM:%ld", (long)speed_rpm);
+  LCD_Printf(MENU_VIEW_SAFE_MARGIN, 114, "Angle:%ld", (long)angle_degree);
+  draw_safe_string(MENU_VIEW_SAFE_MARGIN, 146U, status);
+  draw_safe_string(MENU_VIEW_SAFE_MARGIN,
+                   (uint16_t)(LCD_GetHeight() - MENU_VIEW_SAFE_MARGIN -
+                              ASCII_Font24.Height),
+                   "Hold BACK: home");
 }

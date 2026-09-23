@@ -1,3 +1,9 @@
+/**
+ * @file    lcd_hw.h
+ * @brief   ST7789 显示硬件层接口：仅暴露初始化与 RGB565 区域写入。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #ifndef LCD_HW_H
 #define LCD_HW_H
 
@@ -7,7 +13,9 @@
 extern "C" {
 #endif
 
+/** @brief 面板物理宽度，单位像素。 */
 #define LCD_HW_WIDTH  240U
+/** @brief 面板物理高度，单位像素。 */
 #define LCD_HW_HEIGHT 280U
 
 /**

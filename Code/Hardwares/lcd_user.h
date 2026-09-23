@@ -1,3 +1,9 @@
+/**
+ * @file    lcd_user.h
+ * @brief   LCD 用户层接口：8 位索引帧缓存、调色板、图形/文字绘制与统一刷新。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #ifndef LCD_USER_H
 #define LCD_USER_H
 
@@ -10,18 +16,21 @@
 extern "C" {
 #endif
 
+/** @brief 帧缓存逻辑宽度（竖屏方向）。 */
 #define LCD_FB_WIDTH   240U
+/** @brief 帧缓存逻辑高度（竖屏方向）。 */
 #define LCD_FB_HEIGHT  280U
+/** @brief 由 8/8/8 位 RGB 分量合成 16 位 RGB565 颜色。 */
 #define LCD_RGB565(r, g, b) \
   ((uint16_t)((((uint16_t)(r) & 0xF8U) << 8) | \
               (((uint16_t)(g) & 0xFCU) << 3) | ((uint16_t)(b) >> 3)))
 
 typedef struct {
-  uint32_t update_count;
-  uint32_t pixels_flushed;
-  uint32_t palette_overflows;
-  uint16_t palette_size;
-  uint16_t dirty_tile_count;
+  uint32_t update_count;       /**< LCD_Update 累计调用次数。 */
+  uint32_t pixels_flushed;     /**< 累计写入面板的像素数量。 */
+  uint32_t palette_overflows;  /**< 调色板已满导致的近似取色次数。 */
+  uint16_t palette_size;       /**< 当前调色板已登记颜色数量。 */
+  uint16_t dirty_tile_count;   /**< 最近一次刷新涉及的分块数量。 */
 } LCD_Stats;
 
 /**

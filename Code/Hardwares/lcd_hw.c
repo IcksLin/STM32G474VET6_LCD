@@ -1,15 +1,21 @@
+/**
+ * @file    lcd_hw.c
+ * @brief   ST7789 硬件层实现：GPIO/SPI 控制、初始化序列与 RGB565 区域写入。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #include "lcd_hw.h"
 
 #include "spi.h"
 
-#define LCD_CS_PORT GPIO_PORT_D_BASE
-#define LCD_CS_PIN  GPIO_PIN_11
-#define LCD_DC_PIN  GPIO_PIN_12
-#define LCD_BL_PIN  GPIO_PIN_13
+#define LCD_CS_PORT GPIO_PORT_D_BASE /**< 片选所在端口基址。 */
+#define LCD_CS_PIN  GPIO_PIN_11       /**< 片选引脚。 */
+#define LCD_DC_PIN  GPIO_PIN_12       /**< 数据/命令选择引脚。 */
+#define LCD_BL_PIN  GPIO_PIN_13       /**< 背光控制引脚。 */
 
-#define LCD_X_OFFSET 0U
-#define LCD_Y_OFFSET 20U
-#define LCD_TIMEOUT  1000U
+#define LCD_X_OFFSET 0U      /**< 控制器横坐标偏移。 */
+#define LCD_Y_OFFSET 20U     /**< 控制器纵坐标偏移（240x320 面板上的可见区偏移）。 */
+#define LCD_TIMEOUT  1000U   /**< SPI 传输超时，单位毫秒。 */
 
 /**
  * @brief 设置 LCD 片选信号电平

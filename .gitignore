@@ -29,3 +29,7 @@ Thumbs.db
 
 # Host-side one-off image conversion and resize tools
 /Tools/
+!/Tools/
+/Tools/*
+!/Tools/zdt_x57_uart_example.py
+!/Tools/zdt_x57_transport_examples.py

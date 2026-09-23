@@ -1,3 +1,9 @@
+/**
+ * @file    menu_user.h
+ * @brief   用户菜单配置接口：菜单表获取、业务状态初始化与跨页面动作处理。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #ifndef MENU_USER_H
 #define MENU_USER_H
 
@@ -17,6 +23,14 @@ void MenuUser_Init(void);
  * @return 可由菜单核心读取和替换回调的菜单项数组。
  */
 MenuItem *MenuUser_GetItems(size_t *item_count);
+
+/**
+ * @brief 在菜单核心执行默认导航前处理跨页面用户动作。
+ * @param item 当前菜单项。
+ * @param action 本次按键动作。
+ * @return true 动作已被用户层消费；false 继续执行菜单核心默认逻辑。
+ */
+bool MenuUser_HandleGlobalAction(const MenuItem *item, MenuAction action);
 
 /**
  * @brief 用户自定义功能页面的可编译模板。

@@ -18,14 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fdcan.h"
 #include "spi.h"
 #include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "lcd_user.h"
-#include "menu_core.h"
+#include "app_lvgl.h"
+#include "lcd_hw.h"
+#include "zdt_x57.h"
 
 /* USER CODE END Includes */
 
@@ -92,9 +94,11 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM1_Init();
   MX_TIM17_Init();
+  MX_FDCAN2_Init();
   /* USER CODE BEGIN 2 */
-  LCD_UserInit(LCD_DIRECTION_LANDSCAPE);
-  Menu_Init(50U);
+  (void)ZDT_X57_BindFdcan(&hfdcan2);
+  (void)LCD_HW_Init();
+  App_Lvgl_Init();
   HAL_TIM_Base_Start_IT(&htim17);
 
   /* USER CODE END 2 */
@@ -106,7 +110,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    Menu_Process();
+    App_Lvgl_Process();
   }
   /* USER CODE END 3 */
 }

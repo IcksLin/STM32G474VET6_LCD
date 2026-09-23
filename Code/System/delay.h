@@ -1,3 +1,9 @@
+/**
+ * @file    delay.h
+ * @brief   基于 Cortex-M4 DWT 周期计数器的阻塞延时接口。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #ifndef DELAY_H
 #define DELAY_H
 

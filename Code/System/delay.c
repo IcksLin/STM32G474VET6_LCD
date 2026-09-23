@@ -1,8 +1,16 @@
+/**
+ * @file    delay.c
+ * @brief   基于 Cortex-M4 DWT 周期计数器的阻塞延时实现，精度随 SystemCoreClock。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #include "delay.h"
 #include "stm32g4xx.h"
 
+/** @brief 单次等待的最大微秒数，避免 cycle 乘法在 32 位下溢出。 */
 #define DELAY_US_CHUNK_MAX 1000000UL
 
+/** @brief 非零表示 DWT 周期计数器已初始化。 */
 static uint8_t delay_initialized;
 
 void Delay_Init(void)

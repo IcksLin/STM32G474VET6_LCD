@@ -1,3 +1,9 @@
+/**
+ * @file    menu_view.h
+ * @brief   菜单视图接口：把菜单模型绘制到显示层（当前为帧缓存实现，后续可迁移到 LVGL）。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #ifndef MENU_VIEW_H
 #define MENU_VIEW_H
 
@@ -35,5 +41,19 @@ void MenuView_User_FunctionPage_Common(const char *title, const char *line1,
  * @return 无。
  */
 void MenuView_User_KeyRemapTest_8(int32_t value);
+
+/**
+ * @brief 绘制步进电机测试功能页。
+ * @param title 当前子功能标题。
+ * @param mode 当前控制模式名称。
+ * @param speed_rpm 当前有符号速度或位置模式限速。
+ * @param angle_degree 当前有符号相对目标角度。
+ * @param status 最近一次操作状态。
+ * @return 无。
+ */
+void MenuView_User_StepperControl_Common(const char *title, const char *mode,
+                                         int32_t speed_rpm,
+                                         int32_t angle_degree,
+                                         const char *status);
 
 #endif

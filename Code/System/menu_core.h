@@ -1,3 +1,9 @@
+/**
+ * @file    menu_core.h
+ * @brief   菜单内核接口：导航状态机、按键动作分发与限频刷新调度，不依赖具体显示实现。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #ifndef MENU_CORE_H
 #define MENU_CORE_H
 

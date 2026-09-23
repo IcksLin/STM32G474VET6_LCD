@@ -1,3 +1,9 @@
+/**
+ * @file    menu_key.h
+ * @brief   菜单按键适配接口：四键扫描、去抖、长短按判定与动作消费。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #ifndef MENU_KEY_H
 #define MENU_KEY_H
 

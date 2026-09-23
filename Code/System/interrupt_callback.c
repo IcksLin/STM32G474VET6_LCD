@@ -1,3 +1,9 @@
+/**
+ * @file    interrupt_callback.c
+ * @brief   HAL 定时器回调集中实现：TIM17 周期性触发菜单按键扫描。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #include "menu_key.h"
 
 #include "stm32g4xx_hal.h"

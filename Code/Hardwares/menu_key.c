@@ -1,3 +1,9 @@
+/**
+ * @file    menu_key.c
+ * @brief   菜单按键实现：基于 10ms 周期扫描的低电平有效四键状态机。
+ * @note    用户自建代码，非 CubeMX 生成。
+ */
+
 #include "menu_key.h"
 
 #include "main.h"
