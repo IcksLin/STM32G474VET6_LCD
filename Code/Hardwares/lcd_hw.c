@@ -15,7 +15,12 @@
 
 #define LCD_X_OFFSET 0U      /**< 控制器横坐标偏移。 */
 #define LCD_Y_OFFSET 20U     /**< 控制器纵坐标偏移（240x320 面板上的可见区偏移）。 */
-#define LCD_TIMEOUT  1000U   /**< SPI 传输超时，单位毫秒。 */
+#define LCD_TIMEOUT  1000U   /**< SPI 阻塞传输超时，单位毫秒。 */
+
+/** @brief 像素 DMA 传输完成回调。 */
+static LCD_HW_TxCompleteCallback lcd_tx_complete_cb;
+/** @brief 非零表示像素 DMA 正在传输，期间片选保持有效。 */
+static volatile uint8_t lcd_dma_active;
 
 /**
  * @brief 设置 LCD 片选信号电平
@@ -128,33 +133,62 @@ int LCD_HW_Init(void)
 }
 
 /**
- * @brief 将 RGB565 像素块写入 LCD 指定区域
+ * @brief 以 DMA 方式启动一次 RGB565 区域写入（异步）
  * @param x 目标区域左上角横坐标
  * @param y 目标区域左上角纵坐标
  * @param width 目标区域宽度，单位为像素
  * @param height 目标区域高度，单位为像素
- * @param pixels 按行连续排列的 RGB565 像素数据
- * @return 0 写入成功，-1 表示参数非法或 SPI 通信失败
+ * @param pixels 已按面板字节序（高字节在前）排列的像素数据
+ * @return 0 表示 DMA 已启动，-1 表示参数非法或启动失败
  */
 int LCD_HW_WriteAreaRGB565(uint16_t x, uint16_t y, uint16_t width,
                            uint16_t height, const uint16_t *pixels)
 {
-  uint8_t row_data[LCD_HW_WIDTH * 2U];
-  uint16_t row;
-  uint16_t column;
+  uint32_t bytes;
 
   if (pixels == NULL || width == 0U || height == 0U ||
+      lcd_dma_active != 0U ||
       x >= LCD_HW_WIDTH || y >= LCD_HW_HEIGHT ||
       width > LCD_HW_WIDTH - x || height > LCD_HW_HEIGHT - y) return -1;
+
+  bytes = (uint32_t)width * height * 2U;
+  if (bytes > 0xFFFFU) return -1;
+
   if (lcd_set_window(x, y, width, height) != HAL_OK) return -1;
 
-  for (row = 0U; row < height; ++row) {
-    for (column = 0U; column < width; ++column) {
-      uint16_t color = pixels[(uint32_t)row * width + column];
-      row_data[column * 2U] = (uint8_t)(color >> 8);
-      row_data[column * 2U + 1U] = (uint8_t)color;
-    }
-    if (lcd_write(1U, row_data, (uint16_t)(width * 2U)) != HAL_OK) return -1;
+  lcd_cs(GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, LCD_DC_PIN, GPIO_PIN_SET);
+  lcd_dma_active = 1U;
+  if (HAL_SPI_Transmit_DMA(&hspi1, (uint8_t *)pixels, (uint16_t)bytes) !=
+      HAL_OK) {
+    lcd_dma_active = 0U;
+    lcd_cs(GPIO_PIN_SET);
+    return -1;
   }
   return 0;
+}
+
+void LCD_HW_SetTxCompleteCallback(LCD_HW_TxCompleteCallback callback)
+{
+  lcd_tx_complete_cb = callback;
+}
+
+void LCD_HW_HandleTxComplete(void)
+{
+  if (lcd_dma_active == 0U) return;
+  lcd_dma_active = 0U;
+  lcd_cs(GPIO_PIN_SET);
+  if (lcd_tx_complete_cb != NULL) {
+    lcd_tx_complete_cb();
+  }
+}
+
+void LCD_HW_HandleTxError(void)
+{
+  if (lcd_dma_active == 0U) return;
+  lcd_dma_active = 0U;
+  lcd_cs(GPIO_PIN_SET);
+  if (lcd_tx_complete_cb != NULL) {
+    lcd_tx_complete_cb();
+  }
 }
